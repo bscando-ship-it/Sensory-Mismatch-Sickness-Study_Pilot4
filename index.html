@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>감각 불일치와 멀미 연구 v6 (WN×Flash · DAF)</title>
+<title>감각 불일치와 멀미 연구 (WN×Flash · DAF)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <!--
  === 설계 요약 (v6) ===
@@ -298,7 +298,7 @@ function submitPreSurvey(){
  plan = WILLIAMS[subjectId].map((c,p)=>({ block:BLOCK_ORDER[p], condKey:c, cond:CONDITIONS[c] }));
  currentPos=0; currentSet=0; sentInSet=0;
  document.getElementById('planInfo').innerText =
-  `피험자 ${subjectId} — 블록 순서: `+plan.map((x,i)=>`${i+1}.${x.block}(${x.cond.label})`).join('  ');
+  `피험자 번호 ${subjectId} 확인 완료 (총 4블록으로 진행됩니다)`;
  document.getElementById('stepPreSurvey').classList.add('hidden');
  document.getElementById('stepPre').classList.remove('hidden');
 }
