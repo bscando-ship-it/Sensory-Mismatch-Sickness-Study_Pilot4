@@ -130,7 +130,33 @@
   </div>
   <div class="rating-grid" id="ratingScale"></div>
  </div>
-
+ 
+<!-- 블록 종료 설문 -->
+ <div id="stepBlockSurvey" class="hidden">
+  <h2>📋 블록 <span id="blockSurveyNum"></span> 종료 설문</h2>
+  <p style="text-align:center; margin-bottom:20px; color:#555;">방금 끝난 블록에 대해 아래 세 가지 증상의 정도를 평가해 주세요.</p>
+  
+  <div class="survey-q">
+   <p>1. 메스꺼움 (0 전혀 없음 ~ 10 토할 것 같음)</p>
+   <p style="font-size:0.9em; color:#666; margin-top:0;">지금 속이 메스껍거나 울렁거리는 정도</p>
+   <input type="number" id="bs_nausea" min="0" max="10" placeholder="0~10 입력">
+  </div>
+  
+  <div class="survey-q">
+   <p>2. 어지럼·방향감각 (0 전혀 없음 ~ 10 매우 심함)</p>
+   <p style="font-size:0.9em; color:#666; margin-top:0;">지금 어지럽거나 균형·방향감각이 흔들리는 정도</p>
+   <input type="number" id="bs_dizzy" min="0" max="10" placeholder="0~10 입력">
+  </div>
+  
+  <div class="survey-q">
+   <p>3. 두통·눈피로·멍함 (0 전혀 없음 ~ 10 매우 심함)</p>
+   <p style="font-size:0.9em; color:#666; margin-top:0;">지금 머리가 아프거나 눈이 피로하고 멍한 정도</p>
+   <input type="number" id="bs_head" min="0" max="10" placeholder="0~10 입력">
+  </div>
+  
+  <button onclick="submitBlockSurvey()" class="btn" style="margin-top:20px;">설문 제출</button>
+ </div>
+ 
  <!-- rest -->
  <div id="stepBreak" class="hidden text-center">
   <h2 id="breakHeader">휴식</h2>
@@ -262,7 +288,7 @@ let audioContext=null, mediaStream=null, sourceNode=null, workletNode=null, nois
 let mediaRecorder=null, audioChunks=[];
 let readingTimer=null, barTimer=null, flashTimers=[], ratingInterval=null, ratingTimeout=null;
 let selectedScore=-1, setRows=[];
-let zip=new JSZip(), logs=[], preSurveyData={}, postSurveyData={};
+let zip=new JSZip(), logs=[], preSurveyData={}, postSurveyData={}, blockSurveyData=[];
 
 /* ================= 설문 목록 ================= */
 const mssqList = [
@@ -487,7 +513,40 @@ function endBlock(){
  if(mediaStream) mediaStream.getTracks().forEach(t=>t.stop());
  if(audioContext) audioContext.close();
  document.getElementById('stepReading').classList.add('hidden');
- if(currentPos<3){ startRest(); }
+ showBlockSurvey(); // 수정됨: 휴식 전에 설문 화면 호출
+}
+
+// (새로 추가할 함수 1) 블록 설문 화면 표시
+function showBlockSurvey() {
+ document.getElementById('blockSurveyNum').innerText = currentPos + 1;
+ document.getElementById('bs_nausea').value = '';
+ document.getElementById('bs_dizzy').value = '';
+ document.getElementById('bs_head').value = '';
+ document.getElementById('stepBlockSurvey').classList.remove('hidden');
+}
+
+// (새로 추가할 함수 2) 블록 설문 제출 및 다음 단계 이동
+function submitBlockSurvey() {
+ const n = document.getElementById('bs_nausea').value;
+ const d = document.getElementById('bs_dizzy').value;
+ const h = document.getElementById('bs_head').value;
+ 
+ if(n === '' || d === '' || h === '') return alert("모든 항목에 점수를 입력해주세요.");
+ 
+ // 데이터 저장
+ blockSurveyData.push({
+   blockNum: currentPos + 1,
+   blockName: plan[currentPos].block,
+   condKey: plan[currentPos].condKey,
+   nausea: n,
+   dizzy: d,
+   head: h
+ });
+ 
+ document.getElementById('stepBlockSurvey').classList.add('hidden');
+ 
+ // 4번째 블록이면 최종 종합 설문으로, 아니면 휴식으로 이동
+ if(currentPos < 3) { startRest(); }
  else { goToPostSurvey(); }
 }
 
@@ -547,6 +606,13 @@ function downloadAllData(){
  let post="식별코드,"+ssqList.map((_,i)=>'SSQ'+(i+1)).join(',')+","+tlxList.map((_,i)=>'TLX'+(i+1)).join(',')+","+sensList.map((_,i)=>'SENS'+(i+1)).join(',')+"\n";
  post+=`${subjectId},`+ssqList.map((_,i)=>postSurveyData['ssq_'+(i+1)]).join(',')+","+tlxList.map((_,i)=>postSurveyData['tlx_'+(i+1)]).join(',')+","+sensList.map((_,i)=>postSurveyData['sens_'+(i+1)]).join(',')+"\n";
  zip.file(`3_Post_ID${subjectId}_${name}.csv`,"﻿"+post);
+// (추가할 코드) 블록 설문 CSV 생성
+ let bsCsv = "식별코드,블록순서,문장블록,조건,메스꺼움,어지럼,두통_눈피로\n";
+ blockSurveyData.forEach(r => {
+   bsCsv += `${subjectId},${r.blockNum},${r.blockName},${r.condKey},${r.nausea},${r.dizzy},${r.head}\n`;
+ });
+ zip.file(`4_BlockSurvey_ID${subjectId}_${name}.csv`, "\uFEFF" + bsCsv);
+ 
  zip.generateAsync({type:"blob"}).then(c=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(c);
   a.download=`DAF_v6_ID${subjectId}_${name}.zip`; a.click(); btn.innerText="✅ 다운로드 완료!"; btn.style.background="#34a853"; btn.disabled=false; });
 }
