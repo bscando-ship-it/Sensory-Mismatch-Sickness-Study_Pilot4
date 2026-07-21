@@ -163,7 +163,7 @@ const MS_PER_CHAR    = 200;   // 글자당 0.2초 (공백 포함)
 const BLANK_MS       = 120;   // Flash: 청크 사이 공백 시간
 const CHUNK_WORDS    = 4;     // Flash: 청크당 어절 수
 const REST_SECONDS   = 180;   // 블록 간 휴식 (3분) — 필요시 300으로
-const BASELINE_SECONDS = 30;  // 블록 전 baseline
+const BASELINE_SECONDS = 300;  // 블록 전 baseline
 const FMS_SECONDS    = 5;     // FMS 자동 진행 시간
 const NOISE_GAIN     = 0.04;  // 백색소음 레벨 (스테이션별 캘리브레이션 필요)
 
@@ -302,18 +302,35 @@ function submitPreSurvey(){
  document.getElementById('stepPreSurvey').classList.add('hidden');
  document.getElementById('stepPre').classList.remove('hidden');
 }
-
 function startBlock(){
  if(currentPos>=4){ goToPostSurvey(); return; }
  ['stepPre','stepBreak','stepReading','stepRating'].forEach(id=>document.getElementById(id).classList.add('hidden'));
- // baseline
- document.getElementById('baselineTitle').innerText=`블록 ${currentPos+1}/4 준비 — 안정 상태 측정`;
- const disp=document.getElementById('baselineTimerDisplay');
- document.getElementById('stepBaseline').classList.remove('hidden');
- let t=BASELINE_SECONDS; disp.innerText='00:'+String(t).padStart(2,'0');
- clearInterval(window.baseInt);
- window.baseInt=setInterval(()=>{ t--; disp.innerText='00:'+String(Math.max(t,0)).padStart(2,'0');
-  if(t<=0){ clearInterval(window.baseInt); playBeep(); beginReading(); } },1000);
+ 
+ // 첫 번째 블록일 때만 Baseline 측정
+ if(currentPos === 0) {
+  document.getElementById('baselineTitle').innerText=`실험 시작 전 — 안정 상태(Baseline) 측정`;
+  const disp=document.getElementById('baselineTimerDisplay');
+  document.getElementById('stepBaseline').classList.remove('hidden');
+  
+  let t=BASELINE_SECONDS; 
+  // 분:초 형태로 타이머 포맷팅
+  const fmt = x => Math.floor(x/60) + ':' + String(x%60).padStart(2,'0'); 
+  disp.innerText=fmt(t);
+  
+  clearInterval(window.baseInt);
+  window.baseInt=setInterval(()=>{ 
+   t--; 
+   disp.innerText=fmt(Math.max(t,0));
+   if(t<=0){ 
+     clearInterval(window.baseInt); 
+     playBeep(); 
+     beginReading(); 
+   } 
+  },1000);
+ } else {
+  // 두 번째 블록부터는 Baseline 생략하고 바로 문장 읽기 시작
+  beginReading();
+ }
 }
 
 async function beginReading(){
