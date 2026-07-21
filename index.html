@@ -73,19 +73,19 @@
  <div id="stepPreSurvey" class="hidden">
   <h2>📋 [실험 전] 사전 설문</h2>
   <h3>1. 컨디션 점검</h3>
-  <div class="survey-q"><p>1-1. 어젯밤 수면 시간(시간)?</p><input type="number" id="pre_sleep" step="0.5" placeholder="예: 7.5"></div>
-  <div class="survey-q"><p>1-2. 현재 피로도 (0 없음 ~ 10 매우)</p><input type="number" id="pre_fatigue" min="0" max="10" placeholder="0~10"></div>
-  <div class="survey-q"><p>1-3. 최근 24시간 내 신경계 영향 약물 복용?</p>
+  <div class="survey-q"><p>1-1. 어젯밤 수면 시간은 대략 몇 시간입니까?</p><input type="number" id="pre_sleep" step="0.5" placeholder="예: 7.5"></div>
+  <div class="survey-q"><p>1-2. 현재 체감하는 피로도를 평가해 주세요. (0: 전혀 피로하지 않음 ~ 10: 매우 피로함)</p><input type="number" id="pre_fatigue" min="0" max="10" placeholder="0~10"></div>
+  <div class="survey-q"><p>1-3. 최근 24시간 이내에 멀미약, 수면제, 감기약 등 신경계에 영향을 줄 수 있는 약물을 복용하셨습니까?</p>
    <div class="radio-group"><label><input type="radio" name="pre_drug" value="예"> 예</label><label><input type="radio" name="pre_drug" value="아니오" checked> 아니오</label></div></div>
-  <div class="survey-q"><p>1-4. 실험 2시간 내 카페인 섭취?</p>
+  <div class="survey-q"><p>1-4. 실험 시작 전 2시간 이내에 카페인 음료(커피, 에너지 드링크 등)를 섭취하셨습니까?</p>
    <div class="radio-group"><label><input type="radio" name="pre_caf" value="예"> 예</label><label><input type="radio" name="pre_caf" value="아니오" checked> 아니오</label></div></div>
   <h3>2. 현재 신체 증상 (Pre-SSQ)</h3>
-  <p class="survey-note"><strong>지금</strong> 느끼는 증상 (0 없음 / 1 약간 / 2 보통 / 3 심함)</p>
+  <p class="survey-note"><strong>실험 시작 직전인 현재</strong> 느끼는 신체 증상에 체크해 주세요. (0 전혀 없음 / 1 약간 있음 / 2 보통 / 3 심함)</p>
   <div id="pre_ssq_container"></div>
   <h3>3. 멀미 민감도 (MSSQ-Short)</h3>
-  <p class="survey-note">12세 이후 다음 상황에서의 멀미 빈도 (0 전혀 ~ 4 항상)</p>
+  <p class="survey-note">12세 이후부터 현재까지, 다음 상황에서 멀미(메스꺼움, 어지럼증)를 얼마나 자주 느끼는지 체크해 주세요. (0 전혀 없음 / 1 드물게 있음 / 2 가끔 있음 / 3 자주 있음 / 4 항상 있음)</p>
   <div id="mssq_container"></div>
-  <button onclick="submitPreSurvey()" class="btn">설문 제출 및 안내</button>
+  <button onclick="submitPreSurvey()" class="btn">설문 제출 및 안내사항 보기</button>
  </div>
 
  <!-- 안내 -->
