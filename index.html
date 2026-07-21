@@ -583,11 +583,22 @@ function addAudioToZip(m){
   new Blob(audioChunks,{type:'audio/webm'}));
 }
 function playBeep(){
- const C=window.AudioContext||window.webkitAudioContext; const ctx=new C();
- const o=ctx.createOscillator(), g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
- o.type='sine'; o.frequency.setValueAtTime(800,ctx.currentTime);
- g.gain.setValueAtTime(0.4,ctx.currentTime); g.gain.setValueAtTime(0,ctx.currentTime+0.15);
- o.start(); o.stop(ctx.currentTime+0.2);
+ const C=window.AudioContext||window.webkitAudioContext; 
+ const ctx=new C();
+ 
+ // 브라우저 정책에 의해 오디오가 막혀(suspended) 있다면 강제로 깨움
+ if (ctx.state === 'suspended') {
+  ctx.resume();
+ }
+
+ const o=ctx.createOscillator(), g=ctx.createGain(); 
+ o.connect(g); g.connect(ctx.destination);
+ o.type='sine'; 
+ o.frequency.setValueAtTime(800,ctx.currentTime);
+ g.gain.setValueAtTime(0.4,ctx.currentTime); 
+ g.gain.setValueAtTime(0,ctx.currentTime+0.15);
+ o.start(); 
+ o.stop(ctx.currentTime+0.2);
 }
 
 function downloadAllData(){
